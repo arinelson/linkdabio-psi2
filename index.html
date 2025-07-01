@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dra. Ana Oliveira | Psicóloga Clínica</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- Root Variables and Basic Setup --- */
+        :root {
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff00f0;
+            --dark-bg: #0a0a15;
+            --text-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Background Effects --- */
+        #neural-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .node {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--neon-blue), transparent 70%);
+            transition: transform 2s ease-in-out;
+        }
+
+        .connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(to right, rgba(0, 240, 255, 0.1), rgba(255, 0, 240, 0.1));
+            transform-origin: left center;
+        }
+
+        .cyber-grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        /* --- Loading Screen --- */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #000;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar-container {
+            width: 80%;
+            max-width: 300px;
+            height: 8px;
+            background-color: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            box-shadow: 0 0 10px var(--neon-blue);
+            transition: width 0.1s linear;
+        }
+        
+        .loading-subtext {
+            margin-top: 1rem;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* --- Main Content & Layout --- */
+        .main-container {
+            width: 100%;
+            max-width: 680px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s;
+        }
+        
+        .main-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Header Section --- */
+        .profile-pic-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem auto;
+            border-radius: 50%;
+            padding: 5px;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 15px var(--neon-blue);
+            animation: pulse-border 3s infinite;
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-specialty {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .profile-bio {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 2.5rem auto;
+            color: #b0b0c0;
+        }
+
+        /* --- Links / Buttons Section --- */
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .cyber-button {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            border: 2px solid var(--neon-pink);
+            border-radius: 8px;
+            background-color: rgba(255, 0, 240, 0.05);
+            box-shadow: 0 0 15px var(--neon-pink), inset 0 0 10px rgba(255, 0, 240, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: skewX(-30deg);
+            transition: left 0.7s ease;
+        }
+
+        .cyber-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px var(--neon-pink), inset 0 0 15px rgba(255, 0, 240, 0.4);
+            color: white;
+        }
+
+        .cyber-button:hover::before {
+            left: 125%;
+        }
+
+        /* --- Social Icons & Footer --- */
+        .social-icons {
+            margin: 2.5rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .social-icons a {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--neon-blue);
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 8px var(--neon-blue));
+        }
+
+        .footer {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* --- Animations --- */
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 15px var(--neon-blue), inset 0 0 15px var(--neon-blue); }
+            50% { box-shadow: 0 0 25px var(--neon-blue), inset 0 0 25px var(--neon-blue); }
+            100% { box-shadow: 0 0 15px var(--neon-blue), inset 0 0 15px var(--neon-blue); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Elements -->
+    <div id="neural-background"></div>
+    <div class="cyber-grid-overlay"></div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-text">NEURO.MIND</div>
+        <div id="loading-subtext" class="loading-subtext">Calibrando sinapses...</div>
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Main Page Content -->
+    <main id="main-container" class="main-container">
+
+        <!-- Profile Picture -->
+        <div class="profile-pic-container">
+            <img src="https://placehold.co/150x150/0a0a15/e0e0e0?text=Psi" alt="Foto de perfil da Dra. Ana Oliveira" class="profile-pic" onerror="this.onerror=null;this.src='https://placehold.co/150x150/0a0a15/e0e0e0?text=Psi';">
+        </div>
+
+        <!-- Identification -->
+        <header>
+            <h1 class="profile-name">Dra. Ana Oliveira</h1>
+            <p class="profile-specialty">Psicóloga Clínica | Terapia Cognitivo-Comportamental</p>
+            <p class="profile-bio">Conectando mentes à sua melhor versão através da ciência e da empatia.</p>
+        </header>
+
+        <!-- Links -->
+        <section class="links-container">
+            <a href="#" class="cyber-button">Agendar sua Consulta</a>
+            <a href="#" class="cyber-button">Contato via WhatsApp</a>
+            <a href="#" class="cyber-button">Siga no Instagram</a>
+            <a href="#" class="cyber-button">Meus Artigos e Publicações</a>
+            <a href="#" class="cyber-button">Conheça meus Serviços</a>
+        </section>
+
+        <!-- Social Icons -->
+        <section class="social-icons">
+            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+            <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>CRP 00/12345</p>
+            <p>&copy; 2024 Dra. Ana Oliveira. Todos os direitos reservados.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Loading Screen Logic ---
+            const progressBar = document.getElementById('progress-bar');
+            const loadingSubtext = document.getElementById('loading-subtext');
+            const loadingScreen = document.getElementById('loading-screen');
+            const mainContainer = document.getElementById('main-container');
+            
+            const loadingMessages = [
+                "Calibrando sinapses...",
+                "Analisando padrões neurais...",
+                "Estabelecendo conexão...",
+                "Conectando à sua mente..."
+            ];
+            let messageIndex = 0;
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+
+                if (progress > (messageIndex + 1) * 25 && messageIndex < loadingMessages.length -1) {
+                    messageIndex++;
+                    loadingSubtext.innerText = loadingMessages[messageIndex];
+                }
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        mainContainer.classList.add('visible');
+                    }, 500);
+                }
+            }, 100);
+
+
+            // --- Neural Network Background Animation ---
+            const neuralContainer = document.getElementById('neural-background');
+            const nodes = [];
+            const numNodes = 30; // More nodes for a denser network
+
+            // Create nodes
+            for (let i = 0; i < numNodes; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                const size = Math.random() * 8 + 2; // Smaller nodes
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+
+                node.style.width = `${size}px`;
+                node.style.height = `${size}px`;
+                node.style.left = `${x}vw`;
+                node.style.top = `${y}vh`;
+                node.style.opacity = 0.1 + Math.random() * 0.4;
+
+                neuralContainer.appendChild(node);
+                nodes.push({ element: node, x, y, size });
+            }
+
+            // Create connections
+            for (let i = 0; i < numNodes; i++) {
+                for (let j = i + 1; j < numNodes; j++) {
+                    // Connect nodes that are reasonably close
+                    const nodeA = nodes[i];
+                    const nodeB = nodes[j];
+                    const distance = Math.sqrt(Math.pow(nodeA.x - nodeB.x, 2) + Math.pow(nodeA.y - nodeB.y, 2));
+
+                    if (distance < 25) { // Threshold distance to create a connection
+                        const connection = document.createElement('div');
+                        connection.className = 'connection';
+
+                        const length = Math.sqrt(
+                            Math.pow((nodeB.x - nodeA.x) * window.innerWidth / 100, 2) +
+                            Math.pow((nodeB.y - nodeA.y) * window.innerHeight / 100, 2)
+                        );
+                        
+                        const angle = Math.atan2(
+                            (nodeB.y - nodeA.y) * window.innerHeight / 100,
+                            (nodeB.x - nodeA.x) * window.innerWidth / 100
+                        );
+
+                        connection.style.width = `${length}px`;
+                        connection.style.left = `${nodeA.x}vw`;
+                        connection.style.top = `${nodeA.y}vh`;
+                        connection.style.transform = `rotate(${angle}rad)`;
+                        
+                        neuralContainer.appendChild(connection);
+                    }
+                }
+            }
+
+            // Animate nodes
+            setInterval(() => {
+                nodes.forEach(node => {
+                    const scale = 0.8 + Math.random() * 0.6;
+                    node.element.style.transform = `scale(${scale})`;
+                });
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
